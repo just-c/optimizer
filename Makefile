@@ -69,13 +69,13 @@ clean-gen: clean
 	rm -f config.h
 
 check: qbe
-	tools/test.sh all
+	./test.sh all
 
 check-arm64: qbe
-	TARGET=arm64 tools/test.sh all
+	TARGET=arm64 ./test.sh all
 
 check-rv64: qbe
-	TARGET=rv64 tools/test.sh all
+	TARGET=rv64 ./test.sh all
 
 src:
 	@echo $(SRCALL)

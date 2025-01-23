@@ -1,8 +1,8 @@
 #!/bin/sh
 
 dir=`dirname "$0"`
-bin=$dir/../qbe
-binref=$dir/../qbe.ref
+bin=$dir/qbe
+binref=$dir/qbe.ref
 
 tmp=/tmp/qbe.zzzz
 
@@ -197,7 +197,7 @@ case "$1" in
 "all")
 	fail=0
 	count=0
-	for t in $dir/../test/[!_]*.ssa
+	for t in $dir/test/[!_]*.ssa
 	do
 		once $t
 		fail=`expr $fail + $?`
