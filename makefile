@@ -5,12 +5,11 @@ PREFIX = /usr/local
 BINDIR = $(PREFIX)/bin
 
 BUILDDIR = build
-COMMOBJ  = $(BUILDDIR)/main.o $(BUILDDIR)/util.o $(BUILDDIR)/parse.o $(BUILDDIR)/abi.o $(BUILDDIR)/cfg.o $(BUILDDIR)/mem.o $(BUILDDIR)/ssa.o $(BUILDDIR)/alias.o $(BUILDDIR)/load.o \
-           $(BUILDDIR)/copy.o $(BUILDDIR)/fold.o $(BUILDDIR)/simpl.o $(BUILDDIR)/live.o $(BUILDDIR)/spill.o $(BUILDDIR)/rega.o $(BUILDDIR)/emit.o
-AMD64OBJ = $(BUILDDIR)/amd64/targ.o $(BUILDDIR)/amd64/sysv.o $(BUILDDIR)/amd64/isel.o $(BUILDDIR)/amd64/emit.o
-ARM64OBJ = $(BUILDDIR)/arm64/targ.o $(BUILDDIR)/arm64/abi.o $(BUILDDIR)/arm64/isel.o $(BUILDDIR)/arm64/emit.o
-RV64OBJ  = $(BUILDDIR)/rv64/targ.o $(BUILDDIR)/rv64/abi.o $(BUILDDIR)/rv64/isel.o $(BUILDDIR)/rv64/emit.o
-OBJ      = $(COMMOBJ) $(AMD64OBJ) $(ARM64OBJ) $(RV64OBJ)
+COMMOBJ  = main util parse abi cfg mem ssa alias load copy fold simpl live spill rega emit
+AMD64OBJ = amd64/targ amd64/sysv amd64/isel amd64/emit
+ARM64OBJ = arm64/targ arm64/abi arm64/isel arm64/emit
+RV64OBJ  = rv64/targ rv64/abi rv64/isel rv64/emit
+OBJ      = $(COMMOBJ:%=$(BUILDDIR)/%.o) $(AMD64OBJ:%=$(BUILDDIR)/%.o) $(ARM64OBJ:%=$(BUILDDIR)/%.o) $(RV64OBJ:%=$(BUILDDIR)/%.o)
 
 SRCALL   = $(OBJ:$(BUILDDIR)/%.o=%.c)
 
@@ -24,10 +23,10 @@ $(BUILDDIR)/%.o: %.c
 	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(COMMOBJ): all.h ops.h
-$(AMD64OBJ): amd64/all.h
-$(ARM64OBJ): arm64/all.h
-$(RV64OBJ): rv64/all.h
+$(COMMOBJ:%=$(BUILDDIR)/%.o): all.h ops.h
+$(AMD64OBJ:%=$(BUILDDIR)/%.o): amd64/all.h
+$(ARM64OBJ:%=$(BUILDDIR)/%.o): arm64/all.h
+$(RV64OBJ:%=$(BUILDDIR)/%.o): rv64/all.h
 $(BUILDDIR)/main.o: config.h
 
 config.h:
