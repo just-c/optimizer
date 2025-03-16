@@ -4,14 +4,15 @@
 PREFIX = /usr/local
 BINDIR = $(PREFIX)/bin
 
-COMMOBJ  = main.o util.o parse.o abi.o cfg.o mem.o ssa.o alias.o load.o \
-           copy.o fold.o simpl.o live.o spill.o rega.o emit.o
-AMD64OBJ = amd64/targ.o amd64/sysv.o amd64/isel.o amd64/emit.o
-ARM64OBJ = arm64/targ.o arm64/abi.o arm64/isel.o arm64/emit.o
-RV64OBJ  = rv64/targ.o rv64/abi.o rv64/isel.o rv64/emit.o
+BUILDDIR = build
+COMMOBJ  = $(BUILDDIR)/main.o $(BUILDDIR)/util.o $(BUILDDIR)/parse.o $(BUILDDIR)/abi.o $(BUILDDIR)/cfg.o $(BUILDDIR)/mem.o $(BUILDDIR)/ssa.o $(BUILDDIR)/alias.o $(BUILDDIR)/load.o \
+           $(BUILDDIR)/copy.o $(BUILDDIR)/fold.o $(BUILDDIR)/simpl.o $(BUILDDIR)/live.o $(BUILDDIR)/spill.o $(BUILDDIR)/rega.o $(BUILDDIR)/emit.o
+AMD64OBJ = $(BUILDDIR)/amd64/targ.o $(BUILDDIR)/amd64/sysv.o $(BUILDDIR)/amd64/isel.o $(BUILDDIR)/amd64/emit.o
+ARM64OBJ = $(BUILDDIR)/arm64/targ.o $(BUILDDIR)/arm64/abi.o $(BUILDDIR)/arm64/isel.o $(BUILDDIR)/arm64/emit.o
+RV64OBJ  = $(BUILDDIR)/rv64/targ.o $(BUILDDIR)/rv64/abi.o $(BUILDDIR)/rv64/isel.o $(BUILDDIR)/rv64/emit.o
 OBJ      = $(COMMOBJ) $(AMD64OBJ) $(ARM64OBJ) $(RV64OBJ)
 
-SRCALL   = $(OBJ:.o=.c)
+SRCALL   = $(OBJ:$(BUILDDIR)/%.o=%.c)
 
 CC       = cc
 CFLAGS   = -std=c99 -g -Wall -Wextra -Wpedantic
@@ -19,14 +20,15 @@ CFLAGS   = -std=c99 -g -Wall -Wextra -Wpedantic
 qbe: $(OBJ)
 	$(CC) $(LDFLAGS) $(OBJ) -o $@
 
-.c.o:
+$(BUILDDIR)/%.o: %.c
+	@mkdir -p $(dir $@)
 	$(CC) $(CFLAGS) -c $< -o $@
 
-$(OBJ): all.h ops.h
+$(COMMOBJ): all.h ops.h
 $(AMD64OBJ): amd64/all.h
 $(ARM64OBJ): arm64/all.h
 $(RV64OBJ): rv64/all.h
-main.o: config.h
+$(BUILDDIR)/main.o: config.h
 
 config.h:
 	@case `uname` in                               \
@@ -63,7 +65,7 @@ uninstall:
 	rm -f "$(DESTDIR)$(BINDIR)/qbe"
 
 clean:
-	rm -f *.o */*.o qbe
+	rm -f $(BUILDDIR)/*.o $(BUILDDIR)/*/*.o qbe
 
 clean-gen: clean
 	rm -f config.h
